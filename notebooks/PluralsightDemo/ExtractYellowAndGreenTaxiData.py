@@ -101,3 +101,57 @@ default_vals_dict = {
 # COMMAND ----------
 
 yellow_taxi_trips_df = yellow_taxi_trips_df.fillna(default_vals_dict)
+
+# COMMAND ----------
+
+print('Before filter ', yellow_taxi_trips_df.count())
+
+yellow_taxi_trips_df = yellow_taxi_trips_df.drop_duplicates() \
+
+print('After filter ', yellow_taxi_trips_df.count())
+
+# COMMAND ----------
+
+'''
+
+print('Before filter ', yellow_taxi_trips_df.count())
+
+yellow_taxi_trips_df = yellow_taxi_trips_df \
+                        .filter(
+                                "tpep_pickup_datetime >= 2018-12-01 AND tpep_dropoff_datetime <= 2018-12-31" 
+                            )
+
+print('After filter ', yellow_taxi_trips_df.count())
+'''
+
+# COMMAND ----------
+
+# MAGIC %md ## Important thing to note in the above command about date range
+# MAGIC 
+# MAGIC - The above command will NOT properly filter the date range. The 'After filter ' count was 0. 
+# MAGIC - Rather you should use single quote to enclose the date as in the below command
+
+# COMMAND ----------
+
+default_vals_dict = {
+  "payment_type": 5,
+  "RatecodeID": 1
+}
+
+print('Before filter ', yellow_taxi_trips_df.count())
+
+yellow_taxi_trips_df = yellow_taxi_trips_df \
+                        .filter(("passenger_count > 0 AND trip_distance > 0")) \
+                        \
+                        .dropna(subset=["PULocationID", "DOLocationID"]) \
+                        \
+                        .fillna(default_vals_dict) \
+                        \
+                        .drop_duplicates() \
+                        \
+                        .filter("tpep_pickup_datetime >= '2018-12-01' AND tpep_dropoff_datetime <= '2018-12-31'" ) 
+
+print('After filter ', yellow_taxi_trips_df.count())
+
+# COMMAND ----------
+

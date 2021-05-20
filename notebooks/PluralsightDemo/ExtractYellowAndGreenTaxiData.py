@@ -7,6 +7,30 @@ yellow_taxi_trips_df = spark \
 
 # COMMAND ----------
 
+yellow_taxi_trips_df.count()
+
+# COMMAND ----------
+
+# MAGIC %md ###Creating and writing dataframe to a new unmanaged delta table to optimize processing time
+
+# COMMAND ----------
+
+yellow_taxi_trips_df \
+.write \
+.format("delta") \
+.mode("overwrite") \
+.save("/mnt/datalake/yellow_taxi_trips")
+
+# COMMAND ----------
+
+yellow_taxi_trips_df = spark.read.format("delta").load("/mnt/datalake/yellow_taxi_trips")
+
+# COMMAND ----------
+
+yellow_taxi_trips_df.count()
+
+# COMMAND ----------
+
 display(
   yellow_taxi_trips_df.describe(
   "passenger_count",

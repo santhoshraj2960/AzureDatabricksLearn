@@ -3,8 +3,11 @@
 
 # COMMAND ----------
 
-# Reading without specifying the schema takes long time
+# MAGIC %md ###Reading and tranforming Fhvtrips data
 
+# COMMAND ----------
+
+# Reading without specifying the schema takes long time
 
 fhv_trips_df = spark \
               .read \
@@ -41,14 +44,132 @@ fhv_trips_df = spark \
 
 # COMMAND ----------
 
-# MAGIC %fs head /mnt/storage/FhvBases.json
+# MAGIC %md ###Creating a new unmanaged delta table and writing dataframe to it to optimize processing time
 
 # COMMAND ----------
 
-fhv_bases_df = spark \
-                .read \
-                .option('multiline', 'true') \
-                .json('/mnt/storage/FhvBases.json')
+fhv_trips_df.write \
+            .format('delta') \
+            .mode('overwrite') \
+            .save('/mnt/storage/fhv_trips')
+
+# COMMAND ----------
+
+fhv_trips_df = spark.read.format('delta').load('/mnt/storage/fhv_trips')
+
+# COMMAND ----------
+
+fhv_trips_df = fhv_trips_df \
+                .dropna(subset=["PULocationID", "DOLocationID"]) \
+                .drop_duplicates() \
+                .where("Pickup_DateTime >= '2018-12-01' AND DropOff_datetime <= '2018-12-31'")
+
+# COMMAND ----------
+
+# fhv_trips_df.count()
+
+# COMMAND ----------
+
+fhv_trips_df.printSchema()
+
+# COMMAND ----------
+
+# Removing columns that are redundant
+
+fhv_trips_df = fhv_trips_df \
+                .select(
+                 "Pickup_DateTime",
+                 "DropOff_datetime",
+                 "PULocationID",
+                 "DOLocationID",
+                 "SR_Flag",
+                 "Dispatching_base_number"
+                  )
+
+fhv_trips_df.printSchema()
+
+# COMMAND ----------
+
+# MAGIC %md Alternatively in the above command you could have done fhv_trips_df.drop("Dispatching_base_num")
+
+# COMMAND ----------
+
+from pyspark.sql.functions import col
+
+fhv_trips_df = fhv_trips_df.select(
+                            col("Pickup_DateTime").alias("PickupTime"), 
+                            "DropOff_DateTime", 
+                            "PUlocationID", 
+                            "DOlocationID", 
+                            "SR_Flag", 
+                            "Dispatching_base_number"
+                         )
+
+fhv_trips_df.printSchema()
+
+# COMMAND ----------
+
+fhv_trips_df = fhv_trips_df \
+                        .withColumnRenamed("DropOff_DateTime", "DropTime") \
+                        .withColumnRenamed("PUlocationID", "PickupLocationId") \
+                        .withColumnRenamed("DOlocationID", "DropLocationId") \
+                        .withColumnRenamed("Dispatching_base_number", "BaseLicenseNumber")
+
+# COMMAND ----------
+
+fhv_trips_df.printSchema()
+
+# COMMAND ----------
+
+
+
+# COMMAND ----------
+
+from pyspark.sql.functions import year, month, dayofmonth
+
+fhv_trips_df = fhv_trips_df \
+                .withColumn('TripYear', year(col("PickupTime"))) \
+                .withColumn('TripMonth', month(col("PickupTime"))) \
+                \
+                .select(
+                  '*',
+                  dayofmonth(col("PickupTime")).alias('TripDay')
+                )
+
+# COMMAND ----------
+
+from pyspark.sql.functions import unix_timestamp, round
+
+fhv_trips_df = fhv_trips_df \
+                            .withColumn("TripTimeInMinutes", 
+                                        round(
+                                            (unix_timestamp("DropTime") - unix_timestamp("PickupTime")) 
+                                                / 60
+                                        )
+                               )                                               
+
+
+# COMMAND ----------
+
+from pyspark.sql.functions import when
+
+fhv_trips_df = fhv_trips_df \
+                .withColumn('TripType', 
+                                     when(
+                                            col("SR_Flag") == 1,
+                                             "SharedTrip"
+                                        )
+                                    .otherwise("SoloTrip") 
+                           ) \
+                .drop("SR_Flag")
+
+# COMMAND ----------
+
+# MAGIC %md ###Reading and transforming Fhvbases data
+
+# COMMAND ----------
+
+# MAGIC %fs head /mnt/storage/FhvBases.json
 
 # COMMAND ----------
 
@@ -99,77 +220,58 @@ fhv_bases_df = spark \
                 .option('multiline', 'true') \
                 .json('/mnt/storage/FhvBases.json')
 
-display(fhv_bases_df)
+# display(fhv_bases_df)
 
 # COMMAND ----------
 
-# MAGIC %md ###Creating a new unmanaged delta table and writing dataframe to it to optimize processing time
-
-# COMMAND ----------
-
-fhv_trips_df.write \
-            .format('delta') \
-            .mode('overwrite') \
-            .save('/mnt/storage/fhv_trips')
-
-# COMMAND ----------
-
-fhv_trips_df = spark.read.format('delta').load('/mnt/storage/fhv_trips')
-
-# COMMAND ----------
-
-fhv_trips_df = fhv_trips_df \
-                .dropna(subset=["PULocationID", "DOLocationID"]) \
-                .drop_duplicates() \
-                .where("Pickup_DateTime >= '2018-12-01' AND DropOff_datetime <= '2018-12-31'")
-
-# COMMAND ----------
-
-fhv_trips_df.count()
-
-# COMMAND ----------
-
-fhv_trips_df.printSchema()
-
-# COMMAND ----------
-
-# Removing columns that are redundant
-
-fhv_trips_df = fhv_trips_df \
+fhv_bases_df = fhv_bases_df \
                 .select(
-                 "Pickup_DateTime",
-                 "DropOff_datetime",
-                 "PULocationID",
-                 "DOLocationID",
-                 "SR_Flag",
-                 "Dispatching_base_number"
-                  )
-
-fhv_trips_df.printSchema()
-
-# COMMAND ----------
-
-# MAGIC %md Alternatively in the above command you could have done fhv_trips_df.drop("Dispatching_base_num")
+                          col("License Number").alias("BaseLicenseNumber"),
+                          col("Type of Base").alias("BaseType"),
+                          col("Address.Building").alias("AddressBuilding"),
+                          col("Address.Street").alias("AddressStreet"),
+                          col("Address.City").alias("AddressCity"),
+                          col("Address.State").alias("AddressState"),
+                          col("Address.Postcode").alias("AddressPostCode")
+                        )
 
 # COMMAND ----------
 
-from pyspark.sql.functions import col
-
-fhv_trips_df = fhv_trips_df.select(
-                            col("Pickup_DateTime").alias("PickupTime"), 
-                            "DropOff_DateTime", 
-                            "PUlocationID", 
-                            "DOlocationID", 
-                            "SR_Flag", 
-                            "Dispatching_base_number"
-                         )
-
-fhv_trips_df.printSchema()
+# MAGIC %md ###Merging two dataframes 
 
 # COMMAND ----------
 
-fhv_trips_df = fhv_trips_df \
-                        .withColumnRenamed("DropOff_DateTime", "DropTime") \
-                        .withColumnRenamed("PUlocationID", "PickupLocationId") \
-                        .withColumnRenamed("DOlocationID", "DropLocationId") \
-                        .withColumnRenamed("Dispatching_base_number", "BaseLicenseNumber")
+fhv_trips_data_with_bases_df = fhv_trips_df \
+                                          .join(
+                                                fhv_bases_df,
+                                                how="inner",
+                                                on="BaseLicenseNumber"
+                                               )
+
+# COMMAND ----------
+
+display(fhv_trips_data_with_bases_df)
+
+# COMMAND ----------
+
+fhv_trips_data_with_bases_df.printSchema()
+
+# COMMAND ----------
+
+# MAGIC %md ###Generating Report
+
+# COMMAND ----------
+
+from pyspark.sql.functions import sum
+
+# Python in built sum function won't work as expected in the following line. 
+# Need the pyspark sum function which will take a column as argrument and sum the values in it
+
+fhv_trips_report = fhv_trips_data_with_bases_df \
+                    .groupBy(["AddressCity", "BaseType"]) \
+                    .agg(sum("TripTimeInMinutes")) \
+                    .withColumnRenamed("sum(TripTimeInMinutes)", "TotalTripTime") \
+                    .orderBy(["AddressCity", "BaseType"])
+
+# COMMAND ----------
+

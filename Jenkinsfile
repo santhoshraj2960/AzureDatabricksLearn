@@ -1,4 +1,4 @@
-def DBTOKEN = "<databricks-token>"
+def DBTOKEN = credentials('dbkey')
 def DBURL  = "https://adb-5240650903622184.4.azuredatabricks.net/"
 
 stage('Setup') {

@@ -1,4 +1,5 @@
 pipeline {
+      agent any
 
       node{
           def DBTOKEN = "databricks_ws_access_token"

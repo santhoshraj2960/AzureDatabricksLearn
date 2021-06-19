@@ -1,12 +1,12 @@
+def DBTOKEN = "databricks_ws_access_token"
+def DBURL  = "workspace_url"
+def CURRENTRELEASE = "main"
+def GITREPOREMOTE   = "https://github.com/santhoshraj2960/AzureDatabricksLearn"
+
 pipeline {
       agent any
 
-      node{
-          def DBTOKEN = "databricks_ws_access_token"
-          def DBURL  = "workspace_url"
-          def CURRENTRELEASE = "main"
-          def GITREPOREMOTE   = "https://github.com/santhoshraj2960/AzureDatabricksLearn"
-
+      stages {
           stage('Setup') {
               withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN'), 
               string(credentialsId: DBURL, variable: 'WORKSPACEURL')]) {

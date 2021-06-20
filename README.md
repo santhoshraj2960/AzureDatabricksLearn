@@ -20,6 +20,7 @@ Two CI/CDs have been developed for this project (**Azure devops and Jenkins**). 
 ## CI/CD Jenkins
 **Refer to [Jenkins file](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/Jenkinsfile) in the home directory to see jenkins workflow**
 <br/>
+<br/>
 ![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/Jenkins.png)
 <br/>
 <br/>

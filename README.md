@@ -1,17 +1,16 @@
 # Azure Databricks ETL pipeline
 
-The ETL pipeline used for this project is NYC yellow, green and fhv taxi trips data. 
+The ETL pipeline used for this project is to extract, tranform and load New York City's yellow, green and fhv taxi trips. 
 
 ## ETL process
 1. The data is extracted in a raw format from Azure Data Lake gen 1 (**Bronze**) 
 2. Transfromed to add KPIs (**Silver**) 
-3. Facts and reports are created (**Gold**)
-4. The reports are then stored it in a **delta lake** in **Azure Datalake Gen 2 storage**
+3. Facts and reports are created and stored in **delta lake** in **Azure Datalake Gen 2 storage** (**Gold**)
 
 ETL code for respective taxi trips can be found here 
 [ETL notebooks](https://github.com/santhoshraj2960/AzureDatabricksLearn/tree/main/notebooks/ETLProdNotebooks/)
 
-Two CI/CDs have been developed for this project (**Azure devops and Jenkins**). Both of them perform the following tasks
+Same CI / CD process is implemented using 2 different tools (**Azure devops and Jenkins**). Both of them perform the following tasks
 1. Detect push (or PR merge) to main branch
 2. Deploy to staging databricks workspace
 3. Run unit tests (This part is under construction)

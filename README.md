@@ -25,6 +25,7 @@ Same CI / CD process is implemented using 2 different tools (**Azure devops and 
 <br/>
 ## CI/CD Azure devops
 ![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops.png)
+![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops2.png)
 <br/>
 <br/>
 

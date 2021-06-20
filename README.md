@@ -17,10 +17,10 @@ Two CI/CDs have been developed for this project (**Azure devops and Jenkins**). 
 4. Delply to production databricks workspace
 
 **CI/CD Azure devops**
-
+![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops.png)
 
 **CI/CD Jenkins**
-
+![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/Jenkins.png)
 
 
 # ETL pipeline for generating facts of different NYC taxi

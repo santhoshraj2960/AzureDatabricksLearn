@@ -8,33 +8,39 @@ pipeline {
 
       stages {
           stage('Setup') {
-              withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN'), 
-              string(credentialsId: DBURL, variable: 'WORKSPACEURL')]) {
-                sh """#!/bin/bash
-                    python3 -m venv tutorial-env
-                    source tutorial-env/bin/activate
-                    pip install databricks-cli
-                    # Configure Databricks CLI for deployment
-                    echo "$DBURL
-                    $TOKEN" | databricks configure --token
-                    databricks jobs list
-                   """
+              steps{
+                  withCredentials([string(credentialsId: DBTOKEN, variable: 'TOKEN'), 
+                  string(credentialsId: DBURL, variable: 'WORKSPACEURL')]) {
+                    sh """#!/bin/bash
+                        python3 -m venv tutorial-env
+                        source tutorial-env/bin/activate
+                        pip install databricks-cli
+                        # Configure Databricks CLI for deployment
+                        echo "$DBURL
+                        $TOKEN" | databricks configure --token
+                        databricks jobs list
+                       """
+                  }
               }
           }
           stage('Checkout') { // for display purposes
-              echo "Pulling ${CURRENTRELEASE} Branch from Github"
-              git branch: CURRENTRELEASE, url: GITREPOREMOTE
-              sh """#!/bin/bash
-                  ls -l
-                  source tutorial-env/bin/activate
-                  ls -l
-                 """
+            steps{
+                  echo "Pulling ${CURRENTRELEASE} Branch from Github"
+                  git branch: CURRENTRELEASE, url: GITREPOREMOTE
+                  sh """#!/bin/bash
+                      ls -l
+                      source tutorial-env/bin/activate
+                      ls -l
+                     """
+                }
           }
           stage('Deploy') { // for display purposes
-              sh """#!/bin/bash
-                  source tutorial-env/bin/activate
-                  databricks workspace import_dir --overwrite notebooks /Shared/jenkins_deploy
+            steps{
+                  sh """#!/bin/bash
+                      source tutorial-env/bin/activate
+                      databricks workspace import_dir --overwrite notebooks /Shared/jenkins_deploy
                  """
+            }
           }
       }
 }

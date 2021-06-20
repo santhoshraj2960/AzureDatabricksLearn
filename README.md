@@ -1,8 +1,26 @@
 # Azure Databricks ETL pipeline
 
-Building a ETL pipeline for NYC taxi data using Databricks with the help of Deltalake.
+The ETL pipeline used for this project is NYC yellow, green and fhv taxi trips data. 
 
-Anticipate to build the ETL process using Airflow
+**ETL process**
+1. The data is extracted in a raw format from Azure Data Lake gen 1 (**Bronze**) 
+2. Transfromed to add KPIs (**Silver**) 
+3. Facts and reports are created (**Gold**)
+4. The reports are then stored it in a **delta lake** in **Azure Datalake Gen 2 storage**
+
+ETL code for respective taxi trips can be found here https://github.com/santhoshraj2960/AzureDatabricksLearn/tree/main/notebooks/ETLProdNotebooks/
+
+Two CI/CDs have been developed for this project (**Azure devops and Jenkins**). Both of them perform the following tasks
+1. Detect push (or PR merge) to main branch
+2. Deploy to staging databricks workspace
+3. Run unit tests (This part is under construction)
+4. Delply to production databricks workspace
+
+**CI/CD Azure devops**
+
+**CI/CD Jenkins**
+
+
 
 # ETL pipeline for generating facts of different NYC taxi
 

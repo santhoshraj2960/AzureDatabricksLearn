@@ -1,6 +1,4 @@
-# AzureDatabricksLearn
-
-The repo is under construction.
+# Azure Databricks ETL pipeline
 
 Building a ETL pipeline for NYC taxi data using Databricks with the help of Deltalake.
 

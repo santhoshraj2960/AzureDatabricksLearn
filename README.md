@@ -26,7 +26,7 @@ Jenkins url: http://52.168.7.77:8080/
 <br/>
 <br/>
 ## CI/CD Azure devops
-![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops.png)
+![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops1.png)
 ![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/AzureDevops2.png)
 <br/>
 <br/>

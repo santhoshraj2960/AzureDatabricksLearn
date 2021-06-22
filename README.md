@@ -19,6 +19,8 @@ Same CI / CD process is implemented using 2 different tools (**Azure devops and 
 ## CI/CD Jenkins
 **Refer to [Jenkins file](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/Jenkinsfile) in the home directory to see jenkins workflow**
 <br/>
+Jenkins url: http://52.168.7.77:8080/
+<br/>
 <br/>
 ![alt text](https://github.com/santhoshraj2960/ETL-Databricks-Azure/blob/main/screenshots/Jenkins.png)
 <br/>
